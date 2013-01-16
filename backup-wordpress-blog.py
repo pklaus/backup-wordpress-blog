@@ -46,11 +46,11 @@ def post_file_name(post, short=True, extension='txt'):
         '%s_%s_%s.%s' % (status, when, post.slug, extension)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Backing up the /etc directory of remote computers.')
+    parser = argparse.ArgumentParser(description='Backing up the blog posts of a Wordpress blog to your local file system.')
     parser.add_argument('url', metavar='BLOG_URL',
                         help='The URL of your Wordpress Blog')
     parser.add_argument('-u', '--username',
-                        help='Folder to store the /etc backups.')
+                        help='Username used to login to your blog.')
     parser.add_argument('-f', '--folder', default='./',
                         help='Folder to store the backups of the blog posts.')
     args = parser.parse_args()
