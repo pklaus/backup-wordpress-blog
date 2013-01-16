@@ -52,7 +52,9 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--username',
                         help='Username used to login to your blog.')
     parser.add_argument('-f', '--folder', default='./',
-                        help='Folder to store the backups of the blog posts.')
+                        help='Folder to store the backups of the blog posts (./).')
+    parser.add_argument('-n', '--number', type=int, default=2000,
+                        help='Number of blog posts to back up (2000).')
     args = parser.parse_args()
 
     site = sanitize_url(args.url)
