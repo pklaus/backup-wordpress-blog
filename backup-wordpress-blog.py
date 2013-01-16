@@ -12,10 +12,11 @@ Install the dependency python-wordpress-xmlrpc using
 from wordpress_xmlrpc import Client
 from wordpress_xmlrpc.methods import posts
 from wordpress_xmlrpc.methods import users
+from wordpress_xmlrpc.exceptions import InvalidCredentialsError
 
 import datetime as dt
 
-import argparse, os, errno
+import argparse, os, errno, sys, time
 
 def login(site, user):
     if not user:
@@ -34,14 +35,14 @@ def sanitize_url(url):
 
 def post_file_name(post, short=True, extension='txt'):
     status = post.post_status
-    stati = {'draft': 'd', 'private': 'pr', 'publish': 'p'}
-    try:
-        status = stati[status]
-    except:
-        pass
     if short:
+        stati = {'draft': 'd', 'private': 'pr', 'publish': 'p'}
+        try:
+            status = stati[status]
+        except:
+            pass
         when = post.date.date().isoformat().replace('-','')
-        return '%s_%s_%s.%s' % (status, when, post.slug[:16], extension)
+        return '%s_%s_%s.%s' % (status, when, post.slug[:22], extension)
     else:
         when = post.date.isoformat().replace('T','_').replace(':','-')
         '%s_%s_%s.%s' % (status, when, post.slug, extension)
@@ -56,8 +57,12 @@ if __name__ == '__main__':
                         help='Folder to store the backups of the blog posts (./).')
     parser.add_argument('-n', '--number', type=int, default=2000,
                         help='Number of blog posts to back up (2000).')
+    parser.add_argument('-l', '--long-filenames', action='store_true',
+                        help='Use extended filenames for the blog post backup files.')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Run in debug mode (used by the developer).')
+    parser.add_argument('-e', '--extension', default='txt',
+                        help='The file extension of the backed up blog post files (txt).')
     args = parser.parse_args()
 
     site = sanitize_url(args.url)
@@ -65,7 +70,11 @@ if __name__ == '__main__':
 
     wp = login(site, user)
 
-    #print wp.call(users.GetUserInfo())
+    try:
+        wp.call(users.GetUserInfo())
+    except InvalidCredentialsError:
+        print "Invalid credentials"
+        sys.exit(1)
 
     posts = wp.call(posts.GetPosts({'number': args.number,}))
 
@@ -81,9 +90,14 @@ if __name__ == '__main__':
         if args.debug:
             print post.sticky
             continue
-        fname = post_file_name(post)
-        f = open(os.path.join(folder, fname ), 'w')
+        tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
+        categories = [t.name for t in post.terms if t.taxonomy == 'category']
+        fname = post_file_name(post, short=(not args.long_filenames), extension=args.extension)
+        fname = os.path.join(folder, fname )
+        f = open(fname, 'w')
         f.write('# %s\n\n' % post.title.encode('utf-8'))
+        f.write('* Categories: %s\n' % ', '.join(categories))
+        f.write('* Tags: %s\n\n' % ', '.join(tags))
         f.write(post.content.encode('utf-8'))
         f.close()
         cr_time = time.mktime(post.date.timetuple())
