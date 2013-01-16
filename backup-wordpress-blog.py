@@ -50,7 +50,7 @@ def post_file_name(post, short=True, extension='txt'):
         return '%s_%s_%s.%s' % (status, when, slug[:22], extension)
     else:
         when = post.date.isoformat().replace('T','_').replace(':','-')
-        '%s_%s_%s.%s' % (status, when, slug, extension)
+        return '%s_%s_%s.%s' % (status, when, slug, extension)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Backing up the blog posts of a Wordpress blog to your local file system.')
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
     posts = wp.call(posts.GetPosts({'number': args.number,}))
 
-    folder = args.folder
+    folder = os.path.abspath(args.folder)
     #folder = os.path.join(folder, dt.date.today().isoformat())
     try:
         os.makedirs(folder)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
         categories = [t.name for t in post.terms if t.taxonomy == 'category']
         fname = post_file_name(post, short=(not args.long_filenames), extension=args.extension)
-        fname = os.path.join(folder, fname )
+        fname = os.path.join(folder, fname)
         f = open(fname, 'w')
         if not args.no_meta:
             f.write('# %s\n\n' % post.title.encode('utf-8'))
