@@ -5,8 +5,8 @@
 Written on 2013-01-16 by Philipp Klaus <philipp.l.klaus →AT→ web.de>.
 Check <https://gist.github.com/4546743> for newer versions.
 
-Install the dependency python-wordpress-xmlrpc using
-     pip install python-wordpress-xmlrpc
+Install the dependencies python-wordpress-xmlrpc and unidecode using
+     pip install python-wordpress-xmlrpc unidecode
 """
 
 from wordpress_xmlrpc import Client
@@ -14,9 +14,10 @@ from wordpress_xmlrpc.methods import posts
 from wordpress_xmlrpc.methods import users
 from wordpress_xmlrpc.exceptions import InvalidCredentialsError
 
-import datetime as dt
+import unidecode
 
-import argparse, os, errno, sys, time
+import datetime as dt
+import argparse, os, errno, sys, time, re
 
 def login(site, user):
     if not user:
@@ -35,6 +36,10 @@ def sanitize_url(url):
 
 def post_file_name(post, short=True, extension='txt'):
     status = post.post_status
+    slug = post.slug
+    if len(slug) == 0 and len(post.title) > 0:
+        # http://stackoverflow.com/a/8366771/183995
+        slug = re.sub(r'\W+', '-', unidecode.unidecode(post.title).lower())
     if short:
         stati = {'draft': 'd', 'private': 'pr', 'publish': 'p'}
         try:
@@ -42,10 +47,10 @@ def post_file_name(post, short=True, extension='txt'):
         except:
             pass
         when = post.date.date().isoformat().replace('-','')
-        return '%s_%s_%s.%s' % (status, when, post.slug[:22], extension)
+        return '%s_%s_%s.%s' % (status, when, slug[:22], extension)
     else:
         when = post.date.isoformat().replace('T','_').replace(':','-')
-        '%s_%s_%s.%s' % (status, when, post.slug, extension)
+        '%s_%s_%s.%s' % (status, when, slug, extension)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Backing up the blog posts of a Wordpress blog to your local file system.')
@@ -59,6 +64,8 @@ if __name__ == '__main__':
                         help='Number of blog posts to back up (2000).')
     parser.add_argument('-l', '--long-filenames', action='store_true',
                         help='Use extended filenames for the blog post backup files.')
+    parser.add_argument('-m', '--no-meta', action='store_true',
+                        help="Don't store any meta information (such as tags) in the backup files.")
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Run in debug mode (used by the developer).')
     parser.add_argument('-e', '--extension', default='txt',
@@ -95,9 +102,14 @@ if __name__ == '__main__':
         fname = post_file_name(post, short=(not args.long_filenames), extension=args.extension)
         fname = os.path.join(folder, fname )
         f = open(fname, 'w')
-        f.write('# %s\n\n' % post.title.encode('utf-8'))
-        f.write('* Categories: %s\n' % ', '.join(categories))
-        f.write('* Tags: %s\n\n' % ', '.join(tags))
+        if not args.no_meta:
+            f.write('# %s\n\n' % post.title.encode('utf-8'))
+            f.write('* Categories: %s\n' % ', '.join(categories))
+            f.write('* Tags: %s\n' % ', '.join(tags))
+            f.write('* Creation Date: %s\n' % post.date.isoformat())
+            f.write('* Modification Date: %s\n' % post.date_modified.isoformat())
+            f.write('* Link: <%s>\n' % post.link)
+            f.write('\n### Content\n\n')
         f.write(post.content.encode('utf-8'))
         f.close()
         cr_time = time.mktime(post.date.timetuple())
