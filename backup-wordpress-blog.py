@@ -40,7 +40,8 @@ def post_file_name(post, short=True, extension='txt'):
     except:
         pass
     if short:
-        return '%s_%s.%s' % (status, post.slug[:16], extension)
+        when = post.date.date().isoformat().replace('-','')
+        return '%s_%s_%s.%s' % (status, when, post.slug[:16], extension)
     else:
         when = post.date.isoformat().replace('T','_').replace(':','-')
         '%s_%s_%s.%s' % (status, when, post.slug, extension)
@@ -55,6 +56,8 @@ if __name__ == '__main__':
                         help='Folder to store the backups of the blog posts (./).')
     parser.add_argument('-n', '--number', type=int, default=2000,
                         help='Number of blog posts to back up (2000).')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Run in debug mode (used by the developer).')
     args = parser.parse_args()
 
     site = sanitize_url(args.url)
@@ -64,7 +67,7 @@ if __name__ == '__main__':
 
     #print wp.call(users.GetUserInfo())
 
-    posts = wp.call(posts.GetPosts({'number': 1000,}))
+    posts = wp.call(posts.GetPosts({'number': args.number,}))
 
     folder = args.folder
     #folder = os.path.join(folder, dt.date.today().isoformat())
@@ -75,10 +78,15 @@ if __name__ == '__main__':
             raise
 
     for post in posts:
+        if args.debug:
+            print post.sticky
+            continue
         fname = post_file_name(post)
         f = open(os.path.join(folder, fname ), 'w')
         f.write('# %s\n\n' % post.title.encode('utf-8'))
         f.write(post.content.encode('utf-8'))
         f.close()
+        cr_time = time.mktime(post.date.timetuple())
+        os.utime(fname, (cr_time, cr_time))
 
     print "Backed up %d blog posts." % len(posts)
