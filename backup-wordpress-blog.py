@@ -23,10 +23,11 @@ except ImportError:
 import datetime as dt
 import argparse, os, errno, sys, time, re
 
-def login(site, user):
+def login(site, user, password=None):
     if not user:
         user = raw_input('Please enter the username for the blog %s: ' % site)
-    password = raw_input('Please enter the password for the user %s: ' % user)
+    if not password:
+        password = raw_input('Please enter the password for the user %s: ' % user)
     return Client(site, user, password)
 
 def sanitize_url(url):
@@ -62,6 +63,8 @@ if __name__ == '__main__':
                         help='The URL of your Wordpress Blog')
     parser.add_argument('-u', '--username',
                         help='Username used to login to your blog.')
+    parser.add_argument('-p', '--password',
+                        help='Password used to login to your blog.')
     parser.add_argument('-f', '--folder', default='./',
                         help='Folder to store the backups of the blog posts (./).')
     parser.add_argument('-n', '--number', type=int, default=2000,
@@ -77,9 +80,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     site = sanitize_url(args.url)
-    user = args.username
 
-    wp = login(site, user)
+    wp = login(site, args.username, args.password)
 
     try:
         wp.call(users.GetUserInfo())
