@@ -9,12 +9,16 @@ Install the dependencies python-wordpress-xmlrpc and unidecode using
      pip install python-wordpress-xmlrpc unidecode
 """
 
-from wordpress_xmlrpc import Client
-from wordpress_xmlrpc.methods import posts
-from wordpress_xmlrpc.methods import users
-from wordpress_xmlrpc.exceptions import InvalidCredentialsError
+try:
+    from wordpress_xmlrpc import Client
+    from wordpress_xmlrpc.methods import posts
+    from wordpress_xmlrpc.methods import users
+    from wordpress_xmlrpc.exceptions import InvalidCredentialsError
 
-import unidecode
+    import unidecode
+except ImportError:
+    print "You need to install python-wordpress-xmlrpc and unidecode using pip first. Exiting"
+    import sys; sys.exit(1)
 
 import datetime as dt
 import argparse, os, errno, sys, time, re
