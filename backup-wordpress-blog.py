@@ -43,8 +43,11 @@ def post_file_name(post, short=True, extension='txt'):
     status = post.post_status
     slug = post.slug
     if len(slug) == 0 and len(post.title) > 0:
+        title = post.title
+        if type(title) == str:
+            title = title.decode('utf-8')
         # http://stackoverflow.com/a/8366771/183995
-        slug = re.sub(r'\W+', '-', unidecode.unidecode(post.title).lower())
+        slug = re.sub(r'\W+', '-', unidecode.unidecode(title).lower())
     if short:
         stati = {'draft': 'd', 'private': 'pr', 'publish': 'p'}
         try:
