@@ -112,6 +112,10 @@ if __name__ == '__main__':
         fname = os.path.join(folder, fname)
         f = open(fname, 'w')
         if not args.no_meta:
+            # Or YAML Style Frontmatter
+            # inspired by http://egonschiele.github.io/mdpress/
+            # See http://jekyllrb.com/docs/frontmatter/
+            # and http://en.wikipedia.org/wiki/YAML#Lists
             f.write('# %s\n\n' % post.title.encode('utf-8'))
             f.write('* Categories: %s\n' % ', '.join(categories))
             f.write('* Tags: %s\n' % ', '.join(tags))
