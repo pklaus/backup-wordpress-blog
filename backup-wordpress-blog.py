@@ -17,7 +17,7 @@ try:
 
     import unidecode
 except ImportError:
-    print "You need to install python-wordpress-xmlrpc and unidecode using pip first. Exiting"
+    print("You need to install python-wordpress-xmlrpc and unidecode using pip first. Exiting")
     import sys; sys.exit(1)
 
 import datetime as dt
@@ -25,9 +25,9 @@ import argparse, os, errno, sys, time, re
 
 def login(site, user, password=None):
     if not user:
-        user = raw_input('Please enter the username for the blog %s: ' % site)
+        user = input('Please enter the username for the blog %s: ' % site)
     if not password:
-        password = raw_input('Please enter the password for the user %s: ' % user)
+        password = input('Please enter the password for the user %s: ' % user)
     return Client(site, user, password)
 
 def sanitize_url(url):
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     try:
         wp.call(users.GetUserInfo())
     except InvalidCredentialsError:
-        print "Invalid credentials"
+        print("Invalid credentials")
         sys.exit(1)
 
     posts = wp.call(posts.GetPosts({'number': args.number,}))
@@ -98,13 +98,13 @@ if __name__ == '__main__':
     #folder = os.path.join(folder, dt.date.today().isoformat())
     try:
         os.makedirs(folder)
-    except OSError, e:
+    except OSError as e:
         if not e.errno == errno.EEXIST:
             raise
 
     for post in posts:
         if args.debug:
-            print post.sticky
+            print(post.sticky)
             continue
         tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
         categories = [t.name for t in post.terms if t.taxonomy == 'category']
@@ -128,4 +128,4 @@ if __name__ == '__main__':
         cr_time = time.mktime(post.date.timetuple())
         os.utime(fname, (cr_time, cr_time))
 
-    print "Backed up %d blog posts." % len(posts)
+    print("Backed up %d blog posts." % len(posts))
