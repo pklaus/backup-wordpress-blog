@@ -97,7 +97,9 @@ if __name__ == '__main__':
         print("Invalid credentials")
         sys.exit(1)
 
+    if args.debug: print("Fetching posts now...")
     posts = wp.call(posts.GetPosts({'number': args.number,}))
+    if args.debug: print("Fetched {} posts. Saving them now...".format(len(posts)))
 
     folder = os.path.abspath(args.folder)
     #folder = os.path.join(folder, dt.date.today().isoformat())
@@ -127,4 +129,4 @@ if __name__ == '__main__':
         cr_time = time.mktime(post.date.timetuple())
         os.utime(fname, (cr_time, cr_time))
 
-    print("Backed up %d blog posts." % len(posts))
+    print("Successfully backed up %d blog posts." % len(posts))
