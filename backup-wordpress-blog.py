@@ -39,6 +39,13 @@ def sanitize_url(url):
         url += 'xmlrpc.php'
     return url
 
+def ensure_folder_exists(folder):
+    try:
+        os.makedirs(folder)
+    except OSError as e:
+        if not e.errno == errno.EEXIST:
+            raise
+
 def post_file_name(post, short=True, extension='txt'):
     status = post.post_status
     slug = post.slug
@@ -94,11 +101,8 @@ if __name__ == '__main__':
 
     folder = os.path.abspath(args.folder)
     #folder = os.path.join(folder, dt.date.today().isoformat())
-    try:
-        os.makedirs(folder)
-    except OSError as e:
-        if not e.errno == errno.EEXIST:
-            raise
+
+    ensure_folder_exists(folder)
 
     for post in posts:
         tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
