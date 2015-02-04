@@ -13,6 +13,7 @@ try:
     from wordpress_xmlrpc import Client
     from wordpress_xmlrpc.methods import posts
     from wordpress_xmlrpc.methods import users
+    from wordpress_xmlrpc.methods import media
     from wordpress_xmlrpc.exceptions import InvalidCredentialsError
 
     import unidecode
@@ -21,6 +22,10 @@ except ImportError:
     import sys; sys.exit(1)
 
 import datetime as dt
+import json
+from urllib.parse import urlparse
+from urllib.request import urlopen
+import shutil
 import argparse, os, errno, sys, time, re
 
 def login(site, user, password=None):
@@ -81,6 +86,8 @@ if __name__ == '__main__':
                         help='Use extended filenames for the blog post backup files.')
     parser.add_argument('--no-meta', action='store_true',
                         help="Don't store any meta information (such as tags) in the backup files.")
+    parser.add_argument('--media', action='store_true',
+                        help='Also backup media files and their metadata.')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Run in debug mode (used by the developer).')
     parser.add_argument('-e', '--extension', default='txt',
@@ -97,14 +104,46 @@ if __name__ == '__main__':
         print("Invalid credentials")
         sys.exit(1)
 
-    if args.debug: print("Fetching posts now...")
-    posts = wp.call(posts.GetPosts({'number': args.number,}))
-    if args.debug: print("Fetched {} posts. Saving them now...".format(len(posts)))
-
     folder = os.path.abspath(args.folder)
     #folder = os.path.join(folder, dt.date.today().isoformat())
 
     ensure_folder_exists(folder)
+
+    if args.media:
+        media_path = os.path.join(folder, 'media')
+
+        ensure_folder_exists(media_path)
+
+        if args.debug: print("Fetching media library list...")
+        media_list = wp.call(media.GetMediaLibrary({}))
+        if args.debug: print("The media library contains {} items. Saving them now...".format(len(media_list)))
+
+        for m in media_list:
+            m_path = '.' + urlparse(m.link).path
+            m_full_path = os.path.join(folder, m_path)
+            m_dict = {
+              'id': m.id,
+              'parent': m.parent,
+              'title': m.title,
+              'description': m.description,
+              'caption': m.caption,
+              'date_created': m.date_created.isoformat(),
+              'link': m.link,
+              'thumbnail': m.thumbnail,
+              'metadata': m.metadata,
+              'path': m_path
+            }
+            m_file = open(os.path.join(media_path, '{}.json'.format(m.id)), 'w')
+            m_file.write(json.dumps(m_dict))
+            m_file.close()
+            ensure_folder_exists(os.path.dirname(m_full_path))
+            if args.debug: print("Downloading media file {}...".format(m.link))
+            with urlopen(m.link) as response, open(m_full_path, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+
+    if args.debug: print("Fetching posts now...")
+    posts = wp.call(posts.GetPosts({'number': args.number,}))
+    if args.debug: print("Fetched {} posts. Saving them now...".format(len(posts)))
 
     for post in posts:
         tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
