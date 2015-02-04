@@ -69,22 +69,22 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Backing up the blog posts of a Wordpress blog to your local file system.')
     parser.add_argument('url', metavar='BLOG_URL',
                         help='The URL of your Wordpress Blog')
-    parser.add_argument('-u', '--username',
+    parser.add_argument('--username', '-u',
                         help='Username used to login to your blog.')
-    parser.add_argument('-p', '--password',
+    parser.add_argument('--password', '-p',
                         help='Password used to login to your blog.')
-    parser.add_argument('-f', '--folder', default='./',
+    parser.add_argument('--folder', '-f', default='./',
                         help='Folder to store the backups of the blog posts (./).')
-    parser.add_argument('-n', '--number', type=int, default=2000,
-                        help='Number of blog posts to back up (2000).')
-    parser.add_argument('-l', '--long-filenames', action='store_true',
+    parser.add_argument('--number', '-n', type=int, default=4000,
+                        help='Number of blog posts to back up (default is 4000).')
+    parser.add_argument('--long-filenames', '-l', action='store_true',
                         help='Use extended filenames for the blog post backup files.')
-    parser.add_argument('-m', '--no-meta', action='store_true',
+    parser.add_argument('--no-meta', action='store_true',
                         help="Don't store any meta information (such as tags) in the backup files.")
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Run in debug mode (used by the developer).')
     parser.add_argument('-e', '--extension', default='txt',
-                        help='The file extension of the backed up blog post files (txt).')
+                        help='The file extension of the backed up blog post files (default is txt).')
     args = parser.parse_args()
 
     site = sanitize_url(args.url)
