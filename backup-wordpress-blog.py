@@ -101,9 +101,6 @@ if __name__ == '__main__':
             raise
 
     for post in posts:
-        if args.debug:
-            print(post.sticky)
-            continue
         tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
         categories = [t.name for t in post.terms if t.taxonomy == 'category']
         fname = post_file_name(post, short=(not args.long_filenames), extension=args.extension)
