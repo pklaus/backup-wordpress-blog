@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Written on 2013-01-16 by Philipp Klaus <philipp.l.klaus →AT→ web.de>.
-Check <https://gist.github.com/4546743> for newer versions.
-
-Install the dependencies python-wordpress-xmlrpc and unidecode using
-     pip install python-wordpress-xmlrpc unidecode
+(c) 2013,2015 by Philipp Klaus <philipp.l.klaus →AT→ web.de>.
+Check <https://github.com/pklaus/backup-wordpress-blog> for newer versions.
 """
 
 try:
