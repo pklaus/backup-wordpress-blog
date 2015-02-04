@@ -44,8 +44,6 @@ def post_file_name(post, short=True, extension='txt'):
     slug = post.slug
     if len(slug) == 0 and len(post.title) > 0:
         title = post.title
-        if type(title) == str:
-            title = title.decode('utf-8')
         # http://stackoverflow.com/a/8366771/183995
         slug = re.sub(r'\W+', '-', unidecode.unidecode(title).lower())
     if short:
@@ -116,14 +114,14 @@ if __name__ == '__main__':
             # inspired by http://egonschiele.github.io/mdpress/
             # See http://jekyllrb.com/docs/frontmatter/
             # and http://en.wikipedia.org/wiki/YAML#Lists
-            f.write('# %s\n\n' % post.title.encode('utf-8'))
+            f.write('# %s\n\n' % post.title)
             f.write('* Categories: %s\n' % ', '.join(categories))
             f.write('* Tags: %s\n' % ', '.join(tags))
             f.write('* Creation Date: %s\n' % post.date.isoformat())
             f.write('* Modification Date: %s\n' % post.date_modified.isoformat())
             f.write('* Link: <%s>\n' % post.link)
             f.write('\n### Content\n\n')
-        f.write(post.content.encode('utf-8'))
+        f.write(post.content)
         f.close()
         cr_time = time.mktime(post.date.timetuple())
         os.utime(fname, (cr_time, cr_time))
