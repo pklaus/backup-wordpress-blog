@@ -85,9 +85,9 @@ if __name__ == '__main__':
                         help="Don't store any meta information (such as tags) in the backup files.")
     parser.add_argument('--media', action='store_true',
                         help='Also backup media files and their metadata.')
-    parser.add_argument('-d', '--debug', action='store_true',
+    parser.add_argument('--debug', '-d', action='store_true',
                         help='Run in debug mode (used by the developer).')
-    parser.add_argument('-e', '--extension', default='txt',
+    parser.add_argument('--extension', '-e', default='txt',
                         help='The file extension of the backed up blog post files (default is txt).')
     args = parser.parse_args()
 

@@ -11,7 +11,8 @@ to host a local copy of my own blog on my laptop (for use on the road etc.).
     usage: backup-wordpress-blog.py [-h] [--username USERNAME]
                                     [--password PASSWORD] [--folder FOLDER]
                                     [--number NUMBER] [--long-filenames]
-                                    [--no-meta] [--media] [-d] [-e EXTENSION]
+                                    [--no-meta] [--media] [--debug]
+                                    [--extension EXTENSION]
                                     BLOG_URL
     
     Backing up the blog posts of a Wordpress blog to your local file system.
@@ -33,8 +34,7 @@ to host a local copy of my own blog on my laptop (for use on the road etc.).
       --no-meta             Don't store any meta information (such as tags) in the
                             backup files.
       --media               Also backup media files and their metadata.
-      -d, --debug           Run in debug mode (used by the developer).
-      -e EXTENSION, --extension EXTENSION
+      --debug, -d           Run in debug mode (used by the developer).
+      --extension EXTENSION, -e EXTENSION
                             The file extension of the backed up blog post files
                             (default is txt).
-
