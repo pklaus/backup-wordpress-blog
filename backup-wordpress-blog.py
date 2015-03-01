@@ -141,6 +141,7 @@ if __name__ == '__main__':
     if args.debug: print("Fetched {} posts. Saving them now...".format(len(posts)))
 
     for post in posts:
+        if args.debug: print("Backing up {}".format(post.title))
         tags = [t.name for t in post.terms if t.taxonomy == 'post_tag']
         categories = [t.name for t in post.terms if t.taxonomy == 'category']
         fname = post_file_name(post, short=(not args.long_filenames), extension=args.extension)
