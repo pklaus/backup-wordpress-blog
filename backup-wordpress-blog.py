@@ -159,7 +159,40 @@ if __name__ == '__main__':
         f.write('\n### Content\n\n')
         f.write(post.content)
         f.close()
+
+        p_dict = {
+          'id': post.id,
+          'user': post.user,
+          'date': post.date.isoformat(),
+          'date_modified': post.date_modified.isoformat(),
+          'slug': post.slug,
+          'post_status': post.post_status,
+          'title': post.title,
+          #'content': post.content,
+          'excerpt': post.excerpt,
+          'link': post.link,
+          'comment_status': post.comment_status,
+          'ping_status': post.ping_status,
+          'terms': [dict(id=t.id, group=t.group, taxonomy=t.taxonomy, name=t.name, slug=t.slug, description=t.description, parent=t.parent, count=t.count) for t in post.terms],
+          #'terms_names': post.terms_names,
+          'custom_fields': post.custom_fields,
+          #'enclosure': post.enclosure,
+          'password': post.password,
+          'post_format': post.post_format,
+          'thumbnail': post.thumbnail,
+          'sticky': post.sticky,
+          'post_type': post.post_type
+        }
+        if p_dict['thumbnail']:
+            # We need to delete the date_created_gmt key because its of the strange type DateTime
+            del p_dict['thumbnail']['date_created_gmt']
+        fmetaname = post_file_name(post, short=(not args.long_filenames), extension='json')
+        fmetaname = os.path.join(folder, fmetaname)
+        fmeta = open(fmetaname, 'w')
+        fmeta.write(json.dumps(p_dict))
+        fmeta.close()
         cr_time = time.mktime(post.date.timetuple())
         os.utime(fname, (cr_time, cr_time))
+        os.utime(fmetaname, (cr_time, cr_time))
 
     print("Successfully backed up %d blog posts." % len(posts))
