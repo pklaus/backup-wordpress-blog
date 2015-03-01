@@ -31,8 +31,6 @@ to host a local copy of my own blog on my laptop (for use on the road etc.).
       --number NUMBER, -n NUMBER
                             Number of blog posts to back up (default is 4000).
       --long-filenames, -l  Use extended filenames for the blog post backup files.
-      --no-meta             Don't store any meta information (such as tags) in the
-                            backup files.
       --media               Also backup media files and their metadata.
       --debug, -d           Run in debug mode (used by the developer).
       --extension EXTENSION, -e EXTENSION

@@ -81,8 +81,6 @@ if __name__ == '__main__':
                         help='Number of blog posts to back up (default is 4000).')
     parser.add_argument('--long-filenames', '-l', action='store_true',
                         help='Use extended filenames for the blog post backup files.')
-    parser.add_argument('--no-meta', action='store_true',
-                        help="Don't store any meta information (such as tags) in the backup files.")
     parser.add_argument('--media', action='store_true',
                         help='Also backup media files and their metadata.')
     parser.add_argument('--debug', '-d', action='store_true',
@@ -148,18 +146,17 @@ if __name__ == '__main__':
         fname = post_file_name(post, short=(not args.long_filenames), extension=args.extension)
         fname = os.path.join(folder, fname)
         f = open(fname, 'w')
-        if not args.no_meta:
-            # Or YAML Style Frontmatter
-            # inspired by http://egonschiele.github.io/mdpress/
-            # See http://jekyllrb.com/docs/frontmatter/
-            # and http://en.wikipedia.org/wiki/YAML#Lists
-            f.write('# %s\n\n' % post.title)
-            f.write('* Categories: %s\n' % ', '.join(categories))
-            f.write('* Tags: %s\n' % ', '.join(tags))
-            f.write('* Creation Date: %s\n' % post.date.isoformat())
-            f.write('* Modification Date: %s\n' % post.date_modified.isoformat())
-            f.write('* Link: <%s>\n' % post.link)
-            f.write('\n### Content\n\n')
+        # Alternative: YAML Style Frontmatter
+        # inspired by http://egonschiele.github.io/mdpress/
+        # See http://jekyllrb.com/docs/frontmatter/
+        # and http://en.wikipedia.org/wiki/YAML#Lists
+        f.write('# %s\n\n' % post.title)
+        f.write('* Categories: %s\n' % ', '.join(categories))
+        f.write('* Tags: %s\n' % ', '.join(tags))
+        f.write('* Creation Date: %s\n' % post.date.isoformat())
+        f.write('* Modification Date: %s\n' % post.date_modified.isoformat())
+        f.write('* Link: <%s>\n' % post.link)
+        f.write('\n### Content\n\n')
         f.write(post.content)
         f.close()
         cr_time = time.mktime(post.date.timetuple())
